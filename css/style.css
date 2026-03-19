@@ -3,7 +3,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    background: #1a0a00;
+    background: #3f0f6b;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -15,9 +15,9 @@ body {
 
 h1 {
     font-family: 'Rye', cursive;
-    color: #f5c842;
+    color: #9e42f5;
     font-size: 2.2rem;
-    text-shadow: 0 0 20px #f5a42288, 2px 2px 0 #7a3a00;
+    text-shadow: 0 0 20px #d5f52260, 2px 2px 0 #7a3a00;
     margin-bottom: 10px;
     letter-spacing: 2px;
 }
@@ -29,16 +29,15 @@ h1 {
 }
 
 .ctrl-box {
-    background: rgba(245,200,66,0.08);
-    border: 1px solid #f5c84244;
+    background: rgba(245, 200, 66, 0.075);
+    border: 1px solid #eff31d7a;
     border-radius: 8px;
     padding: 6px 18px;
-    color: #f5c842;
+    color: #9042f5;
     font-size: 0.85rem;
     text-align: center;
 }
 
-.ctrl-box span { color: #fff; font-size: 1rem; }
 .ctrl-box .player-label { font-size: 0.7rem; opacity: 0.7; display: block; margin-bottom: 2px; }
 
 canvas {
