@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Rye&family=Oswald:wght@400;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background: #1a0a00;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Oswald', sans-serif;
+    overflow: hidden;
+}
+
+h1 {
+    font-family: 'Rye', cursive;
+    color: #f5c842;
+    font-size: 2.2rem;
+    text-shadow: 0 0 20px #f5a42288, 2px 2px 0 #7a3a00;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+}
+
+#controls-info {
+    display: flex;
+    gap: 60px;
+    margin-bottom: 10px;
+}
+
+.ctrl-box {
+    background: rgba(245,200,66,0.08);
+    border: 1px solid #f5c84244;
+    border-radius: 8px;
+    padding: 6px 18px;
+    color: #f5c842;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.ctrl-box span { color: #fff; font-size: 1rem; }
+.ctrl-box .player-label { font-size: 0.7rem; opacity: 0.7; display: block; margin-bottom: 2px; }
+
+canvas {
+    border: 3px solid #7a3a00;
+    border-radius: 4px;
+    box-shadow: 0 0 40px #f5a42233, 0 0 80px #00000088;
+    display: block;
+}
+
+#overlay {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    pointer-events: none;
+}
+
+#overlay h2 {
+    font-family: 'Rye', cursive;
+    color: #f5c842;
+    font-size: 3rem;
+    text-shadow: 0 0 30px #f5a422, 3px 3px 0 #5a2000;
+}
+
+#overlay p {
+    color: #fff;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+#restart-btn {
+    background: linear-gradient(135deg, #f5c842, #d4850a);
+    color: #1a0a00;
+    border: none;
+    padding: 12px 36px;
+    font-family: 'Rye', cursive;
+    font-size: 1.1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    pointer-events: all;
+    box-shadow: 0 4px 20px #f5a42255;
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+#restart-btn:hover { transform: scale(1.06); box-shadow: 0 6px 28px #f5a42277; }
+#restart-btn:active { transform: scale(0.97); }
+
+.hidden { display: none !important; }
