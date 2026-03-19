@@ -1,9 +1,9 @@
 let des = document.getElementById('des').getContext('2d')
 
-let carroInimigo = new CarroInimigo(1300, 325, 80, 50, './img/cavaloInimigo_01bg.png')
-let carroInimigo2 = new CarroInimigo(1500, 125, 80, 50, './img/cavaloInimigo_01bg.png')
-let carroInimigo3 = new CarroInimigo(1700, 400, 80, 50, './img/cavaloInimigo_01bg.png')
-let carro = new Carro(100, 325, 80, 50, './img/cavalo_01bg.png')
+let carroInimigo = new CarroInimigo(1300, 325, 150, 60, './img/cavaloInimigo_01bg.png')
+let carroInimigo2 = new CarroInimigo(1500, 125, 150, 60, './img/cavaloInimigo_01bg.png')
+let carroInimigo3 = new CarroInimigo(1700, 400, 150, 60, './img/cavaloInimigo_01bg.png')
+let carro = new Carro(100, 325, 150, 60, './img/cavalo_01bg.png')
 // let medidaCarro = new Carro(100, 325, 85, 50, 'green')
 
 let t1 = new Text()

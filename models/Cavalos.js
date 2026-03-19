@@ -32,8 +32,8 @@ class Carro extends Obj{
         this.y += this.dir
         if(this.y < 62){
             this.y = 62
-        }else if(this.y > 640){
-            this.y = 400
+        }else if(this.y > 550){
+            this.y = 550
         }
     }
 
