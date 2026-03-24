@@ -1,109 +1,81 @@
-class Obj{
-    constructor(x,y,w,h,a){
+const imgCavalo1 = new Image()
+imgCavalo1.src = './img/cavalo_01bg.png'
+
+const imgCavalo2 = new Image()
+imgCavalo2.src = './img/cavaloAmigo_01bg.png'
+
+const imgInimigo = new Image()
+imgInimigo.src = './img/cavaloInimigo_01bg.png'
+
+const MEIO = 310
+const TOPO = 62
+const FUNDO = 550
+const RAIA1_MIN = TOPO
+const RAIA1_MAX = MEIO - 60 
+const RAIA2_MIN = MEIO + 40 
+const RAIA2_MAX = FUNDO
+
+class Obj {
+    constructor(x, y, w, h, img) {
         this.x = x
         this.y = y
         this.w = w
         this.h = h
-        this.a = a  
+        this.img = img
     }
 
-    des_carro(){
-        let img = new Image()
-        img.src = this.a
-        des.drawImage(img, this.x, this.y, this.w, this.h)
+    des_carro() {
+        des.drawImage(this.img, this.x, this.y, this.w, this.h)
     }
-
-    des_quad(){
-        des.fillStyle = this.a
-        des.fillRect(this.x, this.y, this.w, this.h,this.a)
-    }
-
 }
 
-class Carro extends Obj{
+class Carro extends Obj {
+    constructor(x, y, w, h, img, yMin, yMax) {
+        super(x, y, w, h, img)
+        this.yMin = yMin
+        this.yMax = yMax
+        this.dir = 0
+        this.vida = 5
+        this.pontos = 0
+    }
 
-    dir = 0
-    vida = 5
-    pontos = 0
-    frame = 1
-    tempo = 0
-
-    mov_car(){
+    mov_car() {
         this.y += this.dir
-        if(this.y < 62){
-            this.y = 62
-        }else if(this.y > 550){
-            this.y = 550
-        }
+        if (this.y < this.yMin) this.y = this.yMin
+        if (this.y > this.yMax) this.y = this.yMax
     }
 
-    colid(objeto){
-        if((this.x < objeto.x + objeto.w)&&
-          (this.x + this.w > objeto.x)&&
-          (this.y < objeto.y + objeto.h)&&
-          (this.y + this.h > objeto.y)){
-            return true
-        }else{
-            return false
-        }
+    colid(objeto) {
+        return (this.x < objeto.x + objeto.w) &&
+            (this.x + this.w > objeto.x) &&
+            (this.y < objeto.y + objeto.h) &&
+            (this.y + this.h > objeto.y)
     }
-
-    point(objeto){
-        if(objeto.x <= -100){
-            return true
-        }else{
-            return false
-        }
-    }
-
-    anim(nome){
-        this.tempo +=1
-        if(this.tempo > 12){
-            this.tempo = 0
-            this.frame +=1
-        }
-        if(this.frame>2){
-            this.frame=1
-        }
-        
-        this.a = "./img/"+nome+this.frame+"bg.png"
-    }
-
-
-    
 }
 
-class CarroInimigo extends Obj{
-
-    vel = 2
-
-    recomeca(){
-        this.x = 1300
-        this.y =  Math.floor(Math.random() * (638 - 62) + 62)
+class CarroInimigo extends Obj {
+    constructor(x, y, w, h, img, yMin, yMax) {
+        super(x, y, w, h, img)
+        this.yMin = yMin
+        this.yMax = yMax
+        this.vel = 2
     }
 
-    mov_car(){
+    recomeca() {
+        this.x = 1300 + Math.random() * 400
+        this.y = Math.floor(Math.random() * (this.yMax - this.yMin) + this.yMin)
+    }
+
+
+    mov_car() {
         this.x -= this.vel
-        if(this.x <= - 200){            
-            this.recomeca()         
-        }
     }
 }
 
-class Estrada extends Obj{
-    mov_est(){
-        this.x -= 6
-        if(this.x < - 60){
-            this.x = 1300
-        }        
-    }
-}
-
-class Text{
-    des_text(text,x,y,cor,font){
+class Text {
+    des_text(text, x, y, cor, font) {
         des.fillStyle = cor
-        des.lineWidth = '5'
         des.font = font
-        des.fillText(text,x,y)
+        des.fillText(text, x, y)
     }
 }
