@@ -22,6 +22,7 @@ const RAIA1_MIN = TOPO
 const RAIA1_MAX = MEIO - 60
 const RAIA2_MIN = MEIO + 40
 const RAIA2_MAX = FUNDO
+const galopar = new Audio('sons/galopar.mp3')
 
 
 //  CLASSE BASE
@@ -51,7 +52,7 @@ class Cavalo extends Obj {
         this.yMin  = yMin
         this.yMax  = yMax
         this.dir   = 0
-        this.vida  = 5   
+        this.vida  = 1  
         this.pontos = 0  
     }
 

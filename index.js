@@ -10,7 +10,11 @@ let cavalo, cavalo2
 let cavaloInimigo, cavaloInimigo2, cavaloInimigo3, cavaloInimigo4
 let coletaveis
 let t1, fase_txt
-
+const failure = new Audio('sons/failure.mp3')
+const somGalopar = new Audio('sons/galopar.mp3')
+somGalopar.loop = true
+somGalopar.volume = 0.3
+let tocouSomDerrota = false
 
 //  INICIALIZA / REINICIA JOGO
 
@@ -38,7 +42,7 @@ function criarJogo() {
 
     t1       = new Text()
     fase_txt = new Text()
-}
+}   
 
 //  CONTROLES  
 
@@ -46,22 +50,37 @@ document.addEventListener('keydown', (e) => {
 
     // Navegação entre telas
     if (tela === 'menu') {
-        if (e.key === 'Enter')              iniciarJogo()
-        if (e.key === 'm' || e.key === 'M') tela = 'manual'
-        if (e.key === 'F1')                 tela = 'sobre'
+        if (e.key === 'Enter')  {
+            iniciarJogo()
+        }            
+        if (e.key === 'm' || e.key === 'M'){
+            tela = 'manual'
+        }
+        if (e.key === 'F1')   {
+            tela = 'sobre'
+        }            
     }
     if (tela === 'manual' || tela === 'sobre') {
-        if (e.key === 'Escape') tela = 'menu'
+        if (e.key === 'Escape'){
+            tela = 'menu'
+        } 
     }
-    if ((tela === 'vitoria' || tela === 'derrota') && e.key === 'Enter') iniciarJogo()
-    if (tela === 'jogo' && e.key === 'Escape') tela = 'menu'
+    if ((tela === 'vitoria' || tela === 'derrota') && e.key === 'Enter'){
+        iniciarJogo()
+    }
+    if (tela === 'jogo' && e.key === 'Escape'){
+        tela = 'menu' 
+    } 
 
     // Movimentação — jogo ativo
     if (tela === 'jogo') {
-        if (e.key === 'w')         cavalo.dir  = -10
-        if (e.key === 's')         cavalo.dir  =  10
-        if (e.key === 'ArrowUp')   { cavalo2.dir = -10; e.preventDefault() }
-        if (e.key === 'ArrowDown') { cavalo2.dir =  10; e.preventDefault() }
+        
+        if (e.key === 'w')cavalo.dir  = -10
+        if (e.key === 's')cavalo.dir  =  10      
+        if (e.key === 'ArrowUp')   cavalo2.dir = -10; e.preventDefault() 
+        if (e.key === 'ArrowDown') cavalo2.dir =  10; e.preventDefault() 
+        
+        
     }
 })
 
@@ -78,10 +97,14 @@ document.addEventListener('keyup', (e) => {
 
 // colisao com inimigo -> perde vida
 function colisao() {
-    if (cavalo.colid(cavaloInimigo))  { cavaloInimigo.recomeca();  cavalo.vida  -= 1 }
-    if (cavalo.colid(cavaloInimigo2)) { cavaloInimigo2.recomeca(); cavalo.vida  -= 1 }
-    if (cavalo2.colid(cavaloInimigo3)){ cavaloInimigo3.recomeca(); cavalo2.vida -= 1 }
-    if (cavalo2.colid(cavaloInimigo4)){ cavaloInimigo4.recomeca(); cavalo2.vida -= 1 }
+    if (cavalo.colid(cavaloInimigo))  { 
+        cavaloInimigo.recomeca();  cavalo.vida  -= 1 }
+    if (cavalo.colid(cavaloInimigo2)) { 
+        cavaloInimigo2.recomeca(); cavalo.vida  -= 1 }
+    if (cavalo2.colid(cavaloInimigo3)){ 
+        cavaloInimigo3.recomeca(); cavalo2.vida -= 1 }
+    if (cavalo2.colid(cavaloInimigo4)){ 
+        cavaloInimigo4.recomeca(); cavalo2.vida -= 1 }
 }
 
 // coleta item -> soma pontos ou recupera vida
@@ -101,10 +124,14 @@ function checarColetaveis() {
 
 // inimigo passou sem colidir -> +5 pontos
 function pontuacao() {
-    if (cavaloInimigo.x  <= -100) { cavalo.pontos  += 5; cavaloInimigo.recomeca()  }
-    if (cavaloInimigo2.x <= -100) { cavalo.pontos  += 5; cavaloInimigo2.recomeca() }
-    if (cavaloInimigo3.x <= -100) { cavalo2.pontos += 5; cavaloInimigo3.recomeca() }
-    if (cavaloInimigo4.x <= -100) { cavalo2.pontos += 5; cavaloInimigo4.recomeca() }
+    if (cavaloInimigo.x  <= -100) { 
+        cavalo.pontos  += 5; cavaloInimigo.recomeca()  }
+    if (cavaloInimigo2.x <= -100) { 
+        cavalo.pontos  += 5; cavaloInimigo2.recomeca() }
+    if (cavaloInimigo3.x <= -100) { 
+        cavalo2.pontos += 5; cavaloInimigo3.recomeca() }
+    if (cavaloInimigo4.x <= -100) { 
+        cavalo2.pontos += 5; cavaloInimigo4.recomeca() }
 }
 
 // progressao de fases 
@@ -216,24 +243,36 @@ function desenha() {
         desenhaHUD()
     }
 }
-
-function atualiza() {
-    if (jogar) {
-        cavalo.mov_cavalo()
-        cavalo2.mov_cavalo()
-        cavaloInimigo.mov_cavalo()
-        cavaloInimigo2.mov_cavalo()
-        cavaloInimigo3.mov_cavalo()
-        cavaloInimigo4.mov_cavalo()
-        coletaveis.forEach(c => c.mover())
-        colisao()
-        checarColetaveis()
-        pontuacao()
-        ver_fase()
-        game_over()
-        checarVitoria()
+    function atualiza() {
+        if (jogar) {
+            cavalo.mov_cavalo()
+            cavalo2.mov_cavalo()
+    
+            cavaloInimigo.mov_cavalo()
+            cavaloInimigo2.mov_cavalo()
+            cavaloInimigo3.mov_cavalo()
+            cavaloInimigo4.mov_cavalo()
+    
+            coletaveis.forEach(c => c.mover())
+    
+            colisao()
+            checarColetaveis()
+            pontuacao()
+            ver_fase()
+            game_over()
+            checarVitoria()
+    
+            // 🎵 SOM DE GALOPAR
+            if (cavalo.dir !== 0 || cavalo2.dir !== 0) {
+                if (somGalopar.paused) {
+                    somGalopar.play().catch(() => {})
+                }
+            } else {
+                somGalopar.pause()
+                somGalopar.currentTime = 0
+            }
+        }
     }
-}
 
 
 //  TELAS ESTATICAS  
@@ -308,15 +347,25 @@ canvas.addEventListener('mousemove', (e) => {
         if (mx >= BX && mx <= BX + BW && my >= by && my <= by + BH) menuHover = i
     })
 })
+canvas.addEventListener('click', (e) => {
 
-canvas.addEventListener('click', () => {
-    if (tela === 'menu') {
-        if (menuHover === 0) iniciarJogo()
-        if (menuHover === 1) tela = 'manual'
-        if (menuHover === 2) tela = 'sobre'
-    }
-    if (tela === 'manual' || tela === 'sobre') tela = 'menu'
-    if (tela === 'vitoria' || tela === 'derrota') iniciarJogo()
+    if (tela !== 'menu') return
+
+    const rect = canvas.getBoundingClientRect()
+
+    const mx = (e.clientX - rect.left) * (1200 / rect.width)
+    const my = (e.clientY - rect.top)  * (700  / rect.height)
+
+    MENU_BTNS.forEach((_, i) => {
+        const by = 230 + i * BGAP
+
+        if (mx >= BX && mx <= BX + BW && my >= by && my <= by + BH) {
+
+            if (i === 0) iniciarJogo()
+            if (i === 1) tela = 'manual'
+            if (i === 2) tela = 'sobre'
+        }
+    })
 })
 
 function iniciarJogo() { criarJogo(); tela = 'jogo' }
@@ -398,9 +447,7 @@ function desenhaSobre() {
         { label: '🎮  Título',               val: 'Horse Dash — Corrida de Cavalos'  },
         { label: '👨‍💻  Desenvolvedor',         val: 'Davi Pereira Fagundes'                  },
         { label: '🐙  GitHub',                val: 'https://github.com/davipf273/game_cavalo'          },
-        { label: '🏫  Disciplina',            val: 'Programação Orientada a Objetos'  },
-        { label: '🏛️  Instituição',           val: 'Sesi Senai'            },
-        { label: '📅  Ano',                   val: new Date().getFullYear().toString()},
+        { label: '📅  Ano',                   val: '2026'},
     ]
 
     let y = 200
@@ -453,7 +500,7 @@ function desenhaVitoria() {
 // ----- Derrota  -----
 let derrotaT = 0
 
-function desenhaDerrota() {
+function desenhaDerrota() { 
     derrotaT += 0.02
     const grd = des.createLinearGradient(0, 0, 0, 700)
     grd.addColorStop(0, '#2a0000'); grd.addColorStop(1, '#0d0420')
@@ -477,9 +524,15 @@ function desenhaDerrota() {
     des.fillStyle = '#4af'
     des.fillText('J2: ' + cavalo2.pontos + ' pts', 600, 465)
     des.textAlign = 'left'
+    if (!tocouSomDerrota) {
+        failure.currentTime = 0
+        failure.play();
+        tocouSomDerrota = true
+    }
 
     textCenter('ENTER ou clique — jogar novamente  •  ESC — menu', 560, 'rgba(255,255,255,0.5)', '18px Arial')
 }
+
 
 
 //  LOOP PRINCIPAL  
