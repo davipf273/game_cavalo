@@ -17,7 +17,7 @@ h1 {
     font-family: 'Rye', cursive;
     color: #9e42f5;
     font-size: 2.2rem;
-    text-shadow: 0 0 20px #d5f52260, 2px 2px 0 #7a3a00;
+    text-shadow: 0 0 20px #d5f52260, 2px 2px 0 #748d03;
     margin-bottom: 10px;
     letter-spacing: 2px;
 }
@@ -41,9 +41,10 @@ h1 {
 .ctrl-box .player-label { font-size: 0.7rem; opacity: 0.7; display: block; margin-bottom: 2px; }
 
 canvas {
-    border: 3px solid #7a3a00;
+    border: 3px solid #00000060;
     border-radius: 4px;
-    box-shadow: 0 0 40px #f5a42233, 0 0 80px #00000088;
+    box-shadow: 0 0 40px #d5f52260, 0 0 80px #00000088;
+    background-image: url();
     display: block;
 }
 
