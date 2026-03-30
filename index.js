@@ -42,7 +42,7 @@ function criarJogo() {
 
     t1       = new Text()
     fase_txt = new Text()
-}   
+}
 
 //  CONTROLES  
 
@@ -77,9 +77,12 @@ document.addEventListener('keydown', (e) => {
         
         if (e.key === 'w')cavalo.dir  = -10
         if (e.key === 's')cavalo.dir  =  10      
-        if (e.key === 'ArrowUp')   cavalo2.dir = -10; e.preventDefault() 
-        if (e.key === 'ArrowDown') cavalo2.dir =  10; e.preventDefault() 
-        
+        if (e.key === 'ArrowUp')   { 
+            cavalo2.dir = -10; e.preventDefault() 
+        }
+        if (e.key === 'ArrowDown') { 
+            cavalo2.dir =  10; e.preventDefault() 
+        }
         
     }
 })
@@ -262,7 +265,6 @@ function desenha() {
             game_over()
             checarVitoria()
     
-            // 🎵 SOM DE GALOPAR
             if (cavalo.dir !== 0 || cavalo2.dir !== 0) {
                 if (somGalopar.paused) {
                     somGalopar.play().catch(() => {})

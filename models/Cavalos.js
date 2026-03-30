@@ -52,7 +52,7 @@ class Cavalo extends Obj {
         this.yMin  = yMin
         this.yMax  = yMax
         this.dir   = 0
-        this.vida  = 1  
+        this.vida  = 5
         this.pontos = 0  
     }
 
@@ -79,7 +79,7 @@ class CavaloInimigo extends Obj {
         super(x, y, w, h, img)
         this.yMin = yMin
         this.yMax = yMax
-        this.vel  = 2   // velocidade inicial — fase 1
+        this.vel  = 5   // velocidade inicial — fase 1
     }
 
     recomeca() {
