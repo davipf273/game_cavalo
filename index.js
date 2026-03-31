@@ -1,8 +1,3 @@
-// ============================================================
-//  index.js — Loop, telas e lógica
-//  Requer: models/Cavalos.js carregado antes no HTML
-// ============================================================
-
 const des = document.getElementById('des').getContext('2d')
 
 // ---------- ESTADO GLOBAL ----------
