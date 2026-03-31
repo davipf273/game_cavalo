@@ -1,4 +1,3 @@
-// ---------- IMAGENS ----------
 const imgCavalo1 = new Image()
 imgCavalo1.src = './img/cavalo_01bg.png'
 
@@ -8,11 +7,19 @@ imgCavalo2.src = './img/cavaloAmigo_01bg.png'
 const imgInimigo = new Image()
 imgInimigo.src = './img/cavaloInimigo_01bg.png'
 
-// Backgrounds por fase 
+// Backgrounds por fase
 const imgBg = [null, new Image(), new Image(), new Image()]
 imgBg[1].src = './img/bg1.jpg'
 imgBg[2].src = './img/bg2.jpg'
 imgBg[3].src = './img/bg3.jpg'
+
+// ---------- ÁUDIO ----------
+const somGalopar = new Audio('/sons/galopar.mp3')
+somGalopar.loop   = true
+somGalopar.volume = 0.6
+
+const somDerrota = new Audio('/sons/failure.mp3')
+somDerrota.volume = 0.3
 
 // ---------- CONSTANTES DE PISTA ----------
 const MEIO      = 310
@@ -22,11 +29,8 @@ const RAIA1_MIN = TOPO
 const RAIA1_MAX = MEIO - 60
 const RAIA2_MIN = MEIO + 40
 const RAIA2_MAX = FUNDO
-const galopar = new Audio('sons/galopar.mp3')
-
 
 //  CLASSE BASE
-
 
 class Obj {
     constructor(x, y, w, h, img) {
@@ -42,44 +46,45 @@ class Obj {
     }
 }
 
-
 //  JOGADOR
-
 
 class Cavalo extends Obj {
     constructor(x, y, w, h, img, yMin, yMax) {
         super(x, y, w, h, img)
-        this.yMin  = yMin
-        this.yMax  = yMax
-        this.dir   = 0
-        this.vida  = 5
-        this.pontos = 0  
+        this.yMin   = yMin
+        this.yMax   = yMax
+        this.dir    = 0
+        this.vida   = 5
+        this.pontos = 0
     }
 
     mov_cavalo() {
         this.y += this.dir
-        if (this.y < this.yMin) this.y = this.yMin
-        if (this.y > this.yMax) this.y = this.yMax
+    
+        if (this.y < this.yMin) {
+            this.y = this.yMin
+        }
+    
+        if (this.y + this.h > this.yMax) {
+            this.y = this.yMax - this.h
+        }
     }
-
     colid(objeto) {
         return (this.x < objeto.x + objeto.w) &&
                (this.x + this.w > objeto.x)   &&
-               (this.y < objeto.y + objeto.h) &&
+               (this.y < objeto.y + objeto.h)  &&
                (this.y + this.h > objeto.y)
     }
 }
 
-
-//  INIMIGO  
-
+//  INIMIGO
 
 class CavaloInimigo extends Obj {
     constructor(x, y, w, h, img, yMin, yMax) {
         super(x, y, w, h, img)
         this.yMin = yMin
         this.yMax = yMax
-        this.vel  = 5   // velocidade inicial — fase 1
+        this.vel  = 5
     }
 
     recomeca() {
@@ -92,9 +97,7 @@ class CavaloInimigo extends Obj {
     }
 }
 
-
-//  COLETÁVEL  ( soma pontos ou devolve vida)
-
+//  COLETÁVEL
 
 class Coletavel {
     constructor(x, y) {
@@ -120,23 +123,22 @@ class Coletavel {
     desenhar() {
         if (!this.ativo) return
         des.save()
-        des.shadowBlur  = 14
-        des.shadowColor = this.tipo === 'ponto' ? '#ffe066' : '#66ffaa'
-        des.fillStyle   = this.tipo === 'ponto' ? '#f5c842' : '#2ecc71'
+        des.shadowBlur   = 14
+        des.shadowColor  = this.tipo === 'ponto' ? '#ffe066' : '#66ffaa'
+        des.fillStyle    = this.tipo === 'ponto' ? '#f5c842' : '#2ecc71'
         des.beginPath()
         des.arc(this.x, this.y, this.r, 0, Math.PI * 2)
         des.fill()
-        des.fillStyle       = '#1a0a00'
-        des.font            = 'bold 13px Oswald, Arial'
-        des.textAlign       = 'center'
-        des.textBaseline    = 'middle'
+        des.fillStyle    = '#1a0a00'
+        des.font         = 'bold 13px Arial'
+        des.textAlign    = 'center'
+        des.textBaseline = 'middle'
         des.fillText(this.tipo === 'ponto' ? '★' : '♥', this.x, this.y)
         des.restore()
         des.textAlign    = 'left'
         des.textBaseline = 'alphabetic'
     }
 
-    // verifica contato com um Cavalo
     tocou(cavalo) {
         const dx = cavalo.x + cavalo.w / 2 - this.x
         const dy = cavalo.y + cavalo.h / 2 - this.y
@@ -144,7 +146,7 @@ class Coletavel {
     }
 }
 
-//  TEXTO  
+//  TEXTO
 
 class Text {
     des_text(text, x, y, cor, font) {

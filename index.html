@@ -3,32 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Corrida de Cavalos</title>
-    <link rel="stylesheet" href="./css/style.css">
+    <title>Horse Dash</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Rye&family=Oswald:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <h1> Corrida de Cavalos </h1>
 
     <div id="controls-info">
         <div class="ctrl-box">
-            <h1 class="player-label">Jogador 1</h1>
-            <h1>W</h1> / <h1>S</h1> — Mover
+            <span class="player-label">Jogador 1</span>
+            W / S — Mover
         </div>
         <div class="ctrl-box">
-            <h1 class="player-label">Jogador 2</h1>
-            <h1>↑</h1> / <h1>↓</h1> — Mover
+            <span class="player-label">Jogador 2</span>
+            ↑ / ↓ — Mover
         </div>
     </div>
 
-    <div style="position:relative">
-        <canvas id="des" width="1200" height="620"></canvas>
-        <div id="overlay" class="hidden">
-            <h2 id="overlay-title">Fim de Corrida!</h2>
-            <p id="overlay-sub"></p>
-        </div>
-    </div>
-    
-    <script src="./models/Cavalos.js"></script>
+    <canvas id="des" width="1200" height="700"></canvas>
+
+    <script src="models/Cavalos.js"></script>
     <script src="index.js"></script>
+
 </body>
 </html>

@@ -1,39 +1,69 @@
-let des = document.getElementById('des').getContext('2d')
+// ============================================================
+//  index.js — Loop, telas e lógica
+//  Requer: models/Cavalos.js carregado antes no HTML
+// ============================================================
+
+const des = document.getElementById('des').getContext('2d')
 
 // ---------- ESTADO GLOBAL ----------
-let tela  = 'menu'  
+let tela  = 'menu'
 let jogar = true
 let fase  = 1
 
-// ---------- INSTÂNCIAS (inicializadas em criarJogo) ----------
+// ---------- INSTÂNCIAS ----------
 let cavalo, cavalo2
 let cavaloInimigo, cavaloInimigo2, cavaloInimigo3, cavaloInimigo4
 let coletaveis
 let t1, fase_txt
-const failure = new Audio('sons/failure.mp3')
-const somGalopar = new Audio('sons/galopar.mp3')
-somGalopar.loop = true
-somGalopar.volume = 0.3
-let tocouSomDerrota = false
 
+// ---------- CONTROLE DE ÁUDIO ----------
+let tocouSomDerrota   = false
+let audioDesbloqueado = false
+
+// ============================================================
+//  DESBLOQUEIO DE ÁUDIO
+//  Navegadores bloqueiam play() sem interação do usuário.
+//  Na primeira tecla/clique acordamos todos os sons.
+// ============================================================
+
+function desbloquearAudio() {
+    if (audioDesbloqueado) return
+    audioDesbloqueado = true
+    ;[somGalopar, somDerrota].forEach(audio => {
+        const vol = audio.volume
+        audio.volume = 0
+        audio.play().then(() => {
+            audio.pause()
+            audio.currentTime = 0
+            audio.volume = vol
+        }).catch(() => {})
+    })
+}
+
+document.addEventListener('keydown',     desbloquearAudio)
+document.addEventListener('click',       desbloquearAudio)
+document.addEventListener('pointerdown', desbloquearAudio)
+
+// ============================================================
 //  INICIALIZA / REINICIA JOGO
-
+// ============================================================
 
 function criarJogo() {
     fase  = 1
     jogar = true
+    tocouSomDerrota = false
 
-    // jogadores
+    somGalopar.pause()
+    somGalopar.currentTime = 0
+
     cavalo  = new Cavalo(100, 150, 150, 60, imgCavalo1, RAIA1_MIN, RAIA1_MAX)
     cavalo2 = new Cavalo(100, 430, 150, 60, imgCavalo2, RAIA2_MIN, RAIA2_MAX)
 
-    //inimigos (vel aumenta por fase)
     cavaloInimigo  = new CavaloInimigo(1300, 150, 150, 60, imgInimigo, RAIA1_MIN, RAIA1_MAX)
     cavaloInimigo2 = new CavaloInimigo(1700, 200, 150, 60, imgInimigo, RAIA1_MIN, RAIA1_MAX)
     cavaloInimigo3 = new CavaloInimigo(1500, 420, 150, 60, imgInimigo, RAIA2_MIN, RAIA2_MAX)
     cavaloInimigo4 = new CavaloInimigo(1900, 470, 150, 60, imgInimigo, RAIA2_MIN, RAIA2_MAX)
 
-    // coletaveis
     coletaveis = [
         new Coletavel(900,  180),
         new Coletavel(1100, 460),
@@ -44,46 +74,34 @@ function criarJogo() {
     fase_txt = new Text()
 }
 
-//  CONTROLES  
+// ============================================================
+//  CONTROLES
+// ============================================================
 
 document.addEventListener('keydown', (e) => {
 
-    // Navegação entre telas
     if (tela === 'menu') {
-        if (e.key === 'Enter')  {
-            iniciarJogo()
-        }            
-        if (e.key === 'm' || e.key === 'M'){
-            tela = 'manual'
-        }
-        if (e.key === 'F1')   {
-            tela = 'sobre'
-        }            
+        if (e.key === 'Enter')              iniciarJogo()
+        if (e.key === 'm' || e.key === 'M') tela = 'manual'
+        if (e.key === 'F1')                 tela = 'sobre'
     }
-    if (tela === 'manual' || tela === 'sobre') {
-        if (e.key === 'Escape'){
-            tela = 'menu'
-        } 
-    }
-    if ((tela === 'vitoria' || tela === 'derrota') && e.key === 'Enter'){
-        iniciarJogo()
-    }
-    if (tela === 'jogo' && e.key === 'Escape'){
-        tela = 'menu' 
-    } 
 
-    // Movimentação — jogo ativo
+    if (tela === 'manual' || tela === 'sobre') {
+        if (e.key === 'Escape') tela = 'menu'
+    }
+
+    if ((tela === 'vitoria' || tela === 'derrota') && e.key === 'Enter') iniciarJogo()
+
+    if (tela === 'jogo' && e.key === 'Escape') {
+        pararGalopar()
+        tela = 'menu'
+    }
+
     if (tela === 'jogo') {
-        
-        if (e.key === 'w')cavalo.dir  = -10
-        if (e.key === 's')cavalo.dir  =  10      
-        if (e.key === 'ArrowUp')   { 
-            cavalo2.dir = -10; e.preventDefault() 
-        }
-        if (e.key === 'ArrowDown') { 
-            cavalo2.dir =  10; e.preventDefault() 
-        }
-        
+        if (e.key === 'w')         cavalo.dir  = -10
+        if (e.key === 's')         cavalo.dir  =  10
+        if (e.key === 'ArrowUp')   { cavalo2.dir = -10; e.preventDefault() }
+        if (e.key === 'ArrowDown') { cavalo2.dir =  10; e.preventDefault() }
     }
 })
 
@@ -94,23 +112,50 @@ document.addEventListener('keyup', (e) => {
         if (cavalo2) cavalo2.dir = 0
 })
 
+// ============================================================
+//  CONTROLE DO SOM DE GALOPAR
+// ============================================================
 
-//  LOGICA DO JOGO
+function tocarGalopar() {
+    if (!audioDesbloqueado) return
+    if (somGalopar.paused) {
+        somGalopar.play().catch(err => console.warn('Galopar:', err))
+    }
+}
 
+function pararGalopar() {
+    if (!somGalopar.paused) {
+        somGalopar.pause()
+        somGalopar.currentTime = 0
+    }
+}
+function atualizaSomGalopar() {
+    if (!cavalo || !cavalo2) return
 
-// colisao com inimigo -> perde vida
+    const movendo = cavalo.dir !== 0 || cavalo2.dir !== 0
+
+    if (movendo) {
+        tocarGalopar()
+    } else {
+        pararGalopar()
+    }
+}
+
+// ============================================================
+//  LÓGICA DO JOGO
+// ============================================================
+
 function colisao() {
-    if (cavalo.colid(cavaloInimigo))  { 
+    if (cavalo.colid(cavaloInimigo))   { 
         cavaloInimigo.recomeca();  cavalo.vida  -= 1 }
-    if (cavalo.colid(cavaloInimigo2)) { 
+    if (cavalo.colid(cavaloInimigo2))  { 
         cavaloInimigo2.recomeca(); cavalo.vida  -= 1 }
-    if (cavalo2.colid(cavaloInimigo3)){ 
+    if (cavalo2.colid(cavaloInimigo3)) { 
         cavaloInimigo3.recomeca(); cavalo2.vida -= 1 }
-    if (cavalo2.colid(cavaloInimigo4)){ 
+    if (cavalo2.colid(cavaloInimigo4)) { 
         cavaloInimigo4.recomeca(); cavalo2.vida -= 1 }
 }
 
-// coleta item -> soma pontos ou recupera vida
 function checarColetaveis() {
     coletaveis.forEach(col => {
         if (!col.ativo) return
@@ -125,7 +170,6 @@ function checarColetaveis() {
     })
 }
 
-// inimigo passou sem colidir -> +5 pontos
 function pontuacao() {
     if (cavaloInimigo.x  <= -100) { 
         cavalo.pontos  += 5; cavaloInimigo.recomeca()  }
@@ -137,41 +181,39 @@ function pontuacao() {
         cavalo2.pontos += 5; cavaloInimigo4.recomeca() }
 }
 
-// progressao de fases 
 function ver_fase() {
     const top = Math.max(cavalo.pontos, cavalo2.pontos)
     if (top >= 30 && fase === 1) {
         fase = 2
-        cavaloInimigo.vel = cavaloInimigo2.vel = cavaloInimigo3.vel = cavaloInimigo4.vel = 4
+        cavaloInimigo.vel = cavaloInimigo2.vel = cavaloInimigo3.vel = cavaloInimigo4.vel = 8
     } else if (top >= 60 && fase === 2) {
         fase = 3
-        cavaloInimigo.vel = cavaloInimigo2.vel = cavaloInimigo3.vel = cavaloInimigo4.vel = 6
+        cavaloInimigo.vel = cavaloInimigo2.vel = cavaloInimigo3.vel = cavaloInimigo4.vel = 11
     }
 }
 
-// vitoria: fase 3 + ambos com vida > 0 + pontos >= 90
 function checarVitoria() {
     if (fase === 3
         && cavalo.pontos  >= 90 && cavalo2.pontos >= 90
         && cavalo.vida > 0 && cavalo2.vida > 0) {
         jogar = false
-        tela  = 'vitoria'
+        pararGalopar()
+        tela = 'vitoria'
     }
 }
 
-// game over: qualquer jogador com 0 vidas -> tela de derrota
 function game_over() {
     if (cavalo.vida <= 0 || cavalo2.vida <= 0) {
         jogar = false
-        tela  = 'derrota'
+        pararGalopar()
+        tela = 'derrota'
     }
 }
 
-
+// ============================================================
 //  RENDER — TELA DE JOGO
+// ============================================================
 
-
-// fundo diferente por fase (com fallback gradiente)
 function desenhaFundo() {
     const bg = imgBg[fase]
     if (bg && bg.complete && bg.naturalWidth > 0) {
@@ -179,16 +221,29 @@ function desenhaFundo() {
         des.drawImage(bg, -off,       0, 1200, 700)
         des.drawImage(bg, 1200 - off, 0, 1200, 700)
     } else {
-        const cores = [null,
-            ['#1a3a1a', '#2e6e2e'],
-            ['#1a2a4a', '#2a4a8a'],
-            ['#4a1a1a', '#8a2a2a'],
+        const cores = [
+            null,
+            ['#1a3a1a', '#2e6e2e', '#0a2a0a'],  
+            ['#0a0a2a', '#1a2a5a', '#0a1a3a'],  
+            ['#3a0a0a', '#6a2a0a', '#2a0a0a'],  
         ]
-        const grd = des.createLinearGradient(0, 0, 1200, 0)
-        grd.addColorStop(0, cores[fase][0])
-        grd.addColorStop(1, cores[fase][1])
+        const [c1, c2, c3] = cores[fase]
+
+        
+        const grd = des.createLinearGradient(0, 0, 0, 700)
+        grd.addColorStop(0,   c1)
+        grd.addColorStop(0.5, c2)
+        grd.addColorStop(1,   c3)
         des.fillStyle = grd
         des.fillRect(0, 0, 1200, 700)
+
+        des.fillStyle = 'rgba(255,255,255,0.04)'
+        des.fillRect(0, TOPO - 10, 1200, FUNDO - TOPO + 20)
+
+        des.strokeStyle = 'rgba(255,255,0,0.3)'
+        des.lineWidth = 4
+        des.beginPath(); des.moveTo(0, TOPO - 8);  des.lineTo(1200, TOPO - 8);  des.stroke()
+        des.beginPath(); des.moveTo(0, FUNDO + 8); des.lineTo(1200, FUNDO + 8); des.stroke()
     }
 }
 
@@ -205,7 +260,6 @@ function desenhaLinhaMeio() {
     des.restore()
 }
 
-// barras de vida no HUD
 function desenhaVidas(vida, x, y, cor) {
     for (let i = 0; i < 5; i++) {
         des.fillStyle = i < vida ? cor : 'rgba(255,255,255,0.15)'
@@ -213,23 +267,31 @@ function desenhaVidas(vida, x, y, cor) {
     }
 }
 
-// HUD com pontos, vidas e fase
 function desenhaHUD() {
-    desenhaVidas(cavalo.vida,  900, 15, '#f04')
-    t1.des_text('J1 Pontos: ' + cavalo.pontos,  900, 60, 'yellow', '22px Arial')
+    des.fillStyle = 'rgba(0,0,0,0.45)'
+    des.fillRect(0, 0, 1200, 75)
 
-    desenhaVidas(cavalo2.vida, 20, 15, '#4af')
-    t1.des_text('J2 Pontos: ' + cavalo2.pontos, 20,  60, 'yellow', '22px Arial')
+    // J1 — lado direito
+    desenhaVidas(cavalo.vida, 880, 12, '#f04')
+    t1.des_text('J1 Pontos: ' + cavalo.pontos, 880, 62, 'yellow', '20px Arial')
 
-    fase_txt.des_text('Fase: ' + fase, 540, 40, 'white', '26px Arial')
+    // J2 — lado esquerdo
+    desenhaVidas(cavalo2.vida, 20, 12, '#4af')
+    t1.des_text('J2 Pontos: ' + cavalo2.pontos, 20, 62, 'yellow', '20px Arial')
 
-    // barra de progresso de fase
+    // Fase — centro
+    fase_txt.des_text('Fase: ' + fase, 530, 38, 'white', '26px Arial')
+
     const meta = fase === 1 ? 30 : fase === 2 ? 60 : 90
     const prog = Math.min(Math.max(cavalo.pontos, cavalo2.pontos) / meta, 1)
-    des.fillStyle = 'rgba(0,0,0,0.5)'
-    des.fillRect(440, 48, 320, 10)
+    des.fillStyle = 'rgba(255,255,255,0.15)'
+    des.fillRect(430, 46, 340, 12)
     des.fillStyle = prog >= 1 ? '#2ecc71' : '#f5c842'
-    des.fillRect(440, 48, 320 * prog, 10)
+    des.fillRect(430, 46, 340 * prog, 12)
+   
+    des.strokeStyle = 'rgba(255,255,255,0.3)'
+    des.lineWidth = 1
+    des.strokeRect(430, 46, 340, 12)
 }
 
 function desenha() {
@@ -246,55 +308,47 @@ function desenha() {
         desenhaHUD()
     }
 }
-    function atualiza() {
-        if (jogar) {
-            cavalo.mov_cavalo()
-            cavalo2.mov_cavalo()
-    
-            cavaloInimigo.mov_cavalo()
-            cavaloInimigo2.mov_cavalo()
-            cavaloInimigo3.mov_cavalo()
-            cavaloInimigo4.mov_cavalo()
-    
-            coletaveis.forEach(c => c.mover())
-    
-            colisao()
-            checarColetaveis()
-            pontuacao()
-            ver_fase()
-            game_over()
-            checarVitoria()
-    
-            if (cavalo.dir !== 0 || cavalo2.dir !== 0) {
-                if (somGalopar.paused) {
-                    somGalopar.play().catch(() => {})
-                }
-            } else {
-                somGalopar.pause()
-                somGalopar.currentTime = 0
-            }
-        }
+
+function atualiza() {
+    if (jogar) {
+        cavalo.mov_cavalo()
+        cavalo2.mov_cavalo()
+        cavaloInimigo.mov_cavalo()
+        cavaloInimigo2.mov_cavalo()
+        cavaloInimigo3.mov_cavalo()
+        cavaloInimigo4.mov_cavalo()
+        coletaveis.forEach(c => c.mover())
+        colisao()
+        checarColetaveis()
+        pontuacao()
+        ver_fase()
+        game_over()
+        checarVitoria()
+        atualizaSomGalopar()
     }
+}
 
+// ============================================================
+//  TELAS ESTÁTICAS
+// ============================================================
 
-//  TELAS ESTATICAS  
-
-// utilitarios canvas
 function fillBox(x, y, w, h, r, fill) {
     des.fillStyle = fill
     des.beginPath(); des.roundRect(x, y, w, h, r); des.fill()
 }
+
 function strokeBox(x, y, w, h, r, cor, lw) {
     des.strokeStyle = cor; des.lineWidth = lw
     des.beginPath(); des.roundRect(x, y, w, h, r); des.stroke()
 }
+
 function textCenter(txt, y, cor, font) {
     des.fillStyle = cor; des.font = font
     des.textAlign = 'center'; des.fillText(txt, 600, y)
     des.textAlign = 'left'
 }
 
-// ----- Menu Inicial -----
+// ----- Menu -----
 let menuHover = -1
 
 const MENU_BTNS = [
@@ -309,8 +363,9 @@ function desenhaMenu() {
     grd.addColorStop(0, '#0d0420'); grd.addColorStop(1, '#1a0635')
     des.fillStyle = grd; des.fillRect(0, 0, 1200, 700)
 
-    des.fillStyle = 'rgba(255,255,255,0.15)'
-    for (let i = 0; i < 60; i++) {
+    // estrelas
+    des.fillStyle = 'rgba(255,255,255,0.18)'
+    for (let i = 0; i < 80; i++) {
         des.beginPath()
         des.arc((i * 137.5) % 1200, (i * 89.3) % 700, 1.2, 0, Math.PI * 2)
         des.fill()
@@ -319,7 +374,7 @@ function desenhaMenu() {
     des.shadowBlur = 40; des.shadowColor = '#9e42f5'
     textCenter('🏇 HORSE DASH', 130, '#d5f522', "bold 72px 'Rye', cursive")
     des.shadowBlur = 0
-    textCenter('corrida de cavalos — 2 jogadores', 170, 'rgba(255,255,255,0.5)', '18px Arial')
+    textCenter('corrida de cavalos — 2 jogadores', 172, 'rgba(255,255,255,0.5)', '18px Arial')
 
     MENU_BTNS.forEach((btn, i) => {
         const by    = 230 + i * BGAP
@@ -349,20 +404,18 @@ canvas.addEventListener('mousemove', (e) => {
         if (mx >= BX && mx <= BX + BW && my >= by && my <= by + BH) menuHover = i
     })
 })
+
 canvas.addEventListener('click', (e) => {
+    if (tela === 'manual' || tela === 'sobre') { tela = 'menu'; return }
+    if (tela === 'vitoria' || tela === 'derrota') { iniciarJogo(); return }
 
     if (tela !== 'menu') return
-
     const rect = canvas.getBoundingClientRect()
-
     const mx = (e.clientX - rect.left) * (1200 / rect.width)
     const my = (e.clientY - rect.top)  * (700  / rect.height)
-
     MENU_BTNS.forEach((_, i) => {
         const by = 230 + i * BGAP
-
         if (mx >= BX && mx <= BX + BW && my >= by && my <= by + BH) {
-
             if (i === 0) iniciarJogo()
             if (i === 1) tela = 'manual'
             if (i === 2) tela = 'sobre'
@@ -383,7 +436,6 @@ function desenhaManual() {
     textCenter('📖  MANUAL DE INSTRUÇÕES', 100, '#f5c842', "bold 36px 'Rye', cursive")
 
     const c1 = 120, c2 = 650
-
     let y = 150
     des.fillStyle = '#9e42f5'; des.font = 'bold 20px Arial'
     des.fillText('JOGADOR 1', c1, y); y += 30
@@ -418,9 +470,9 @@ function desenhaManual() {
     des.fillStyle = '#d5f522'; des.font = 'bold 20px Arial'
     des.fillText('FASES', c2, y2); y2 += 30
     ;[
-        'Fase 1 → 30 pts   vel. inimigos: 2',
-        'Fase 2 → 60 pts   vel. inimigos: 4',
-        'Fase 3 → 90 pts   vel. inimigos: 6',
+        'Fase 1 → 30 pts   vel. inimigos: 5',
+        'Fase 2 → 60 pts   vel. inimigos: 8',
+        'Fase 3 → 90 pts   vel. inimigos: 11',
         'Vitória: ambos ≥ 90 pts + vida > 0',
     ].forEach(t => {
         des.fillStyle = '#fff'; des.font = '18px Arial'
@@ -435,7 +487,7 @@ function desenhaManual() {
     textCenter('ESC ou clique para voltar ao menu', 660, 'rgba(255,255,255,0.4)', '16px Arial')
 }
 
-// ----- Sobre  -----
+// ----- Sobre -----
 function desenhaSobre() {
     const grd = des.createLinearGradient(0, 0, 0, 700)
     grd.addColorStop(0, '#0d0420'); grd.addColorStop(1, '#200640')
@@ -446,10 +498,10 @@ function desenhaSobre() {
     textCenter('ℹ️  SOBRE O JOGO', 140, '#9e42f5', "bold 40px 'Rye', cursive")
 
     const itens = [
-        { label: '🎮  Título',               val: 'Horse Dash — Corrida de Cavalos'  },
-        { label: '👨‍💻  Desenvolvedor',         val: 'Davi Pereira Fagundes'                  },
-        { label: '🐙  GitHub',                val: 'https://github.com/davipf273/game_cavalo'          },
-        { label: '📅  Ano',                   val: '2026'},
+        { label: '🎮  Título',       val: 'Horse Dash — Corrida de Cavalos'  },
+        { label: '👨‍💻  Desenvolvedor', val: 'Davi Pereira Fagundes'            },
+        { label: '🐙  GitHub',        val: 'github.com/davipf273/game_cavalo' },
+        { label: '📅  Ano',           val: '2026'                             },
     ]
 
     let y = 200
@@ -466,7 +518,7 @@ function desenhaSobre() {
     textCenter('ESC ou clique para voltar ao menu', 660, 'rgba(255,255,255,0.4)', '16px Arial')
 }
 
-// ----- Vitoria -----
+// ----- Vitória -----
 let vitoriaT = 0
 
 function desenhaVitoria() {
@@ -499,10 +551,10 @@ function desenhaVitoria() {
     textCenter('ENTER ou clique para jogar novamente', 520, 'rgba(255,255,255,0.6)', '20px Arial')
 }
 
-// ----- Derrota  -----
+// ----- Derrota -----
 let derrotaT = 0
 
-function desenhaDerrota() { 
+function desenhaDerrota() {
     derrotaT += 0.02
     const grd = des.createLinearGradient(0, 0, 0, 700)
     grd.addColorStop(0, '#2a0000'); grd.addColorStop(1, '#0d0420')
@@ -526,18 +578,18 @@ function desenhaDerrota() {
     des.fillStyle = '#4af'
     des.fillText('J2: ' + cavalo2.pontos + ' pts', 600, 465)
     des.textAlign = 'left'
+
     if (!tocouSomDerrota) {
-        failure.currentTime = 0
-        failure.play();
         tocouSomDerrota = true
+        somDerrota.currentTime = 0
+        somDerrota.play().catch(err => console.warn('Som derrota:', err))
     }
 
-    textCenter('ENTER ou clique — jogar novamente  •  ESC — menu', 560, 'rgba(255,255,255,0.5)', '18px Arial')
+    textCenter('ENTER ou clique — jogar novamente', 560, 'rgba(255,255,255,0.5)', '18px Arial')
 }
 
+//  LOOP PRINCIPAL
 
-
-//  LOOP PRINCIPAL  
 function main() {
     des.clearRect(0, 0, 1200, 700)
 
